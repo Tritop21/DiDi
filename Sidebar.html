@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <base target="_top">
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        padding: 5px;
+        margin: 0;
+        display: flex;
+        flex-direction: column;
+        min-height: 100vh;
+      }
+      .header {
+        color: #333; 
+        margin-bottom: 5px;
+        text-align: center;
+        line-height: 1.2;
+      }
+      .main {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 5px;
+      }
+      .image {
+        width: 60%;
+      }
+      .highlight {
+        background-color: #d56836;
+      }
+      .button {
+        padding: 4px 6px;
+        background-color: #d56836;
+        border-radius: 6px;
+        color: #fff;
+        border: none;
+        font-size: 16px;
+        font-weight: 400;
+        cursor: pointer;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        margin: 2px;
+        flex: 1;
+      }
+      .button:hover {
+        background-color: #d4602a;
+      }
+      .button-group {
+        display: flex;
+        gap: 5px;
+        justify-content: center;
+        width: 100%;
+      }
+      .button-nextprev {
+        display: flex;
+        gap:50px;
+        width:60%
+      }
+      .button:last-child {
+        margin-right: 0;
+      }
+      .content {
+        border: 1px solid #ccc;
+        padding: 5px;
+      }
+      .didi-input{
+        padding: 10px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="header">
+      <h1>Di Di</h1>
+      <img src="https://i.postimg.cc/yYhg2mQM/dog-removebg-preview.png" class="image" alt="Xiong Di">
+    </div>
+
+    <hr>
+
+    <h3>Suggested Text</h3>
+    <label for="findText">Suggested edits :</label>
+    <div class="didi-input">
+      <div id="findText" class="content"></div>
+    </div>
+
+    <div class="button-group">
+      <button class="button" type="button" onclick="highlightText()">Highlight Text</button>
+      <button class="button" type="button" onclick="unhighlightText()">Unhighlight Text</button>
+    </div>
+
+  <hr>
+
+    <div class="didi-input">
+      <label for="paragraphText">Reasonings:</label>
+      <div id="paragraphText" class="content"></div>
+    </div>
+
+    <div class="didi-input">
+      <label for="replace-text">Replace with:</label>
+      <div id="replaceText" class="content"></div>
+    </div>
+
+    <div class="button-group">
+      <button class="button" onclick="replaceText()">Replace Text</button>
+      <button class="button" type="button" onclick="unhighlightReplaceText()">Unhighlight Text</button>
+    </div>
+
+    <hr>
+
+
+    <div class="button-nextprev">
+      <button class="button" type="button" onclick="textSwitch2(); highlightSentence(); getReplaceText();">Prev</button>
+      <button class="button" type="button" onclick="displayText(); resetIndex();">Analyze</button> 
+      <button class="button" type="button" onclick="textSwitch(); highlightSentence(); getReplaceText();">Next</button>
+    </div>
+
+    <script>
+      function replaceText() {
+        var findText = document.getElementById('findText').innerText;
+        var replaceText = document.getElementById('replaceText').innerText;
+        google.script.run.replaceTextInDoc(findText, replaceText);
+      }
+
+      function unhighlightReplaceText() {
+        var replaceText = document.getElementById('replaceText').innerText;
+        google.script.run.unhighlightText(replaceText);
+      }
+
+      function highlightText() {
+        var findText = document.getElementById('findText').innerText;
+        google.script.run.highlightText(findText);
+      }
+
+      function unhighlightText() {
+        var findText = document.getElementById('findText').innerText;
+        google.script.run.unhighlightText(findText);
+      }
+
+      function displayText() {
+        google.script.run.withSuccessHandler(function(response) {
+          var div = document.getElementById('paragraphText');
+          div.innerText = response;
+        }).getReason();
+      }
+
+      function getReplaceText() {
+        google.script.run.withSuccessHandler(function(response) {
+          document.getElementById('replaceText').innerText = response;
+        }).getReplaceTextFromGS(i%2);
+      }
+
+      function highlightSentence() {
+        google.script.run.withSuccessHandler(function(response) {
+          var div = document.getElementById('findText');
+          div.innerText = response;
+          highlightText(); // Call highlightText after setting the text
+        }).getSentence((i)%2);
+      }
+
+      document.addEventListener('DOMContentLoaded', function() {
+        
+        displayText(); 
+      });
+
+      var i = -1;
+      function textSwitch(){
+        i++;
+        return i%2;
+      }
+
+      function textSwitch2(){
+        if (i >= 1){
+          i--;
+        }
+        return i%2;
+      }
+    </script>
+  </body>
+</html>
